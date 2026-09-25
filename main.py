@@ -11,13 +11,6 @@ white = (255, 255, 255)
 red = (255, 0, 0)
 blue = (0, 0, 255)
 
-# -------------------------
-# BOARD
-# -------------------------
-
-# 0  = empty
-# 1  = red
-# -1 = blue
 
 board = [
     [0, 0, 0, 0, 0, 0, 0, 0],
@@ -30,35 +23,25 @@ board = [
     [0, 0, 0, 0, 0, 0, 0, 0]
 ]
 
-
-# -------------------------
-# RED PIECES
-# -------------------------
-
-# Row 0 -> columns 1,3,5,7
 board[0][1] = 1
 board[0][3] = 1
 board[0][5] = 1
 board[0][7] = 1
 
-# Row 1 -> columns 0,2,4,6
+
 board[1][0] = 1
 board[1][2] = 1
 board[1][4] = 1
 board[1][6] = 1
 
-# Row 2 -> columns 1,3,5,7
+
 board[2][1] = 1
 board[2][3] = 1
 board[2][5] = 1
 board[2][7] = 1
 
 
-# -------------------------
-# BLUE PIECES
-# -------------------------
 
-# Row 5 -> columns 0,2,4,6
 board[5][0] = -1
 board[5][2] = -1
 board[5][4] = -1
@@ -77,10 +60,6 @@ board[7][4] = -1
 board[7][6] = -1
 
 
-# -------------------------
-# CREATE WINDOW
-# -------------------------
-
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("CHECKERAI")
 
@@ -88,19 +67,30 @@ running = True
 
 while running:
 
-    # -------------------------
-    # EVENTS
-    # -------------------------
+
 
     for event in pygame.event.get():
 
         if event.type == pygame.QUIT:
             running = False
+        #MOUSE CLICK CHECK
+        if event.type == pygame.MOUSEBUTTONDOWN:
+
+            x_click, y_click = event.pos
+
+            col = x_click // SQUARE_SIZE
+            row = y_click // SQUARE_SIZE
+
+            print("row =", row, "col =", col)
+            if board[row][col] ==1:
+                print("red is clicked")
+            elif board[row][col] == -1:
+                print("blue peice is clicked")
+            else:
+                print("Empty sqaure")
 
 
-    # -------------------------
-    # DRAW BOARD
-    # -------------------------
+
 
     for row in range(8):
         for col in range(8):
@@ -120,9 +110,7 @@ while running:
             )
 
 
-    # -------------------------
-    # DRAW PIECES
-    # -------------------------
+
 
     for row in range(8):
         for col in range(8):
@@ -151,10 +139,6 @@ while running:
                     SQUARE_SIZE // 2 - 10
                 )
 
-
-    # -------------------------
-    # UPDATE DISPLAY
-    # -------------------------
 
     pygame.display.flip()
 
