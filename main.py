@@ -64,6 +64,7 @@ screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("CHECKERAI")
 
 running = True
+selected_piece = None
 
 while running:
 
@@ -75,22 +76,24 @@ while running:
             running = False
         #MOUSE CLICK CHECK
         if event.type == pygame.MOUSEBUTTONDOWN:
-
             x_click, y_click = event.pos
 
             col = x_click // SQUARE_SIZE
             row = y_click // SQUARE_SIZE
-
+            
             print("row =", row, "col =", col)
-            if board[row][col] ==1:
-                print("red is clicked")
-            elif board[row][col] == -1:
-                print("blue peice is clicked")
+            if selected_piece is None:
+                if board[row][col]==1 or board[row][col]==-1:
+                    selected_piece=(row,col)
             else:
-                print("Empty sqaure")
-
-
-
+                old_row, old_col = selected_piece
+                if board[row][col] == 0:
+                    board[row][col] = board[old_row][old_col]
+                    board[old_row][old_col] = 0
+                    print("Moved from",selected_piece,"to",(row, col))
+                else:
+                    print("Cannot move there!")
+                selected_piece = None
 
     for row in range(8):
         for col in range(8):
