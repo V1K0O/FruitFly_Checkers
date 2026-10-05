@@ -1,9 +1,0 @@
-
-
-EMPTY = 0
-
-RED = 1
-RED_KING = 2
-
-BLUE = -1
-BLUE_KING = -2

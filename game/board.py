@@ -1,55 +1,104 @@
-from .pieces import EMPTY, RED, BLUE
+
+
+from .pieces import (
+    EMPTY,
+    RED,
+    RED_KING,
+    BLUE,
+    BLUE_KING,
+    is_red,
+    is_blue,
+    is_king
+)
 
 
 class Board:
 
     def __init__(self):
+
         self.grid = self.create_initial_board()
 
     def create_initial_board(self):
 
         board = [
-            [0] * 8 for _ in range(8)
+            [EMPTY for _ in range(8)]
+            for _ in range(8)
         ]
 
-        # Red pieces
-        board[0][1] = RED
-        board[0][3] = RED
-        board[0][5] = RED
-        board[0][7] = RED
+        # RED
 
-        board[1][0] = RED
-        board[1][2] = RED
-        board[1][4] = RED
-        board[1][6] = RED
+        for row in range(3):
 
-        board[2][1] = RED
-        board[2][3] = RED
-        board[2][5] = RED
-        board[2][7] = RED
+            for col in range(8):
 
-        # Blue pieces
-        board[5][0] = BLUE
-        board[5][2] = BLUE
-        board[5][4] = BLUE
-        board[5][6] = BLUE
+                if (row + col) % 2 == 1:
 
-        board[6][1] = BLUE
-        board[6][3] = BLUE
-        board[6][5] = BLUE
-        board[6][7] = BLUE
+                    board[row][col] = RED
 
-        board[7][0] = BLUE
-        board[7][2] = BLUE
-        board[7][4] = BLUE
-        board[7][6] = BLUE
+        # BLUE
+        for row in range(5, 8):
+
+            for col in range(8):
+
+                if (row + col) % 2 == 1:
+
+                    board[row][col] = BLUE
 
         return board
 
-    def move_piece(self, start, destination):
+    def get(self, position):
 
-        start_row, start_col = start
-        dest_row, dest_col = destination
+        row, col = position
 
-        self.grid[dest_row][dest_col] = self.grid[start_row][start_col]
-        self.grid[start_row][start_col] = EMPTY
+        return self.grid[row][col]
+
+    def set(self, position, value):
+
+        row, col = position
+
+        self.grid[row][col] = value
+
+    def move_piece(self, start, end):
+
+        piece = self.get(start)
+
+        self.set(start, EMPTY)
+        self.set(end, piece)
+
+    def remove_piece(self, position):
+
+        self.set(position, EMPTY)
+
+    def promote_piece(self, position):
+
+        piece = self.get(position)
+
+        row, col = position
+
+        
+        if piece == RED and row == 7:
+
+            self.set(position, RED_KING)
+
+        
+        elif piece == BLUE and row == 0:
+
+            self.set(position, BLUE_KING)
+
+    def count_pieces(self, player):
+
+        count = 0
+
+        for row in range(8):
+
+            for col in range(8):
+
+                piece = self.grid[row][col]
+
+                if player == RED and is_red(piece):
+                    count += 1
+
+                elif player == BLUE and is_blue(piece):
+                    count += 1
+
+        return count
