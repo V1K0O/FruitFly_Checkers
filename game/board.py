@@ -1,5 +1,3 @@
-
-
 from .pieces import (
     EMPTY,
     RED,
@@ -36,6 +34,7 @@ class Board:
                     board[row][col] = RED
 
         # BLUE
+
         for row in range(5, 8):
 
             for col in range(8):
@@ -63,6 +62,7 @@ class Board:
         piece = self.get(start)
 
         self.set(start, EMPTY)
+
         self.set(end, piece)
 
     def remove_piece(self, position):
@@ -75,12 +75,10 @@ class Board:
 
         row, col = position
 
-        
         if piece == RED and row == 7:
 
             self.set(position, RED_KING)
 
-        
         elif piece == BLUE and row == 0:
 
             self.set(position, BLUE_KING)
@@ -96,9 +94,26 @@ class Board:
                 piece = self.grid[row][col]
 
                 if player == RED and is_red(piece):
+
                     count += 1
 
                 elif player == BLUE and is_blue(piece):
+
                     count += 1
 
         return count
+
+    # =========================================================
+    # COPY BOARD
+    # =========================================================
+
+    def copy(self):
+
+        new_board = Board()
+
+        new_board.grid = [
+            row.copy()
+            for row in self.grid
+        ]
+
+        return new_board

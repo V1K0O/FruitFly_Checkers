@@ -1,15 +1,14 @@
-
 from .board import Board
 
 from .pieces import (
     RED,
     BLUE,
-    EMPTY
 )
 
 from .rules import (
     get_all_moves,
-    get_moves_for_piece
+    get_moves_for_piece,
+    get_capture_moves,
 )
 
 
@@ -29,6 +28,13 @@ class Game:
 
         self.must_continue_capture = False
 
+    def get_legal_moves(self):
+
+        return get_all_moves(
+            self.board,
+            self.current_player
+        )
+
     def reset(self):
 
         self.board = Board()
@@ -43,39 +49,56 @@ class Game:
 
         self.must_continue_capture = False
 
+    # =========================================================
+    # COPY GAME
+    # =========================================================
+
+    def copy(self):
+
+        new_game = Game()
+
+        # Copy the board
+        new_game.board = self.board.copy()
+
+        # Copy game state
+        new_game.current_player = self.current_player
+
+        new_game.selected_piece = self.selected_piece
+
+        new_game.winner = self.winner
+
+        new_game.game_over = self.game_over
+
+        new_game.must_continue_capture = (
+            self.must_continue_capture
+        )
+
+        return new_game
+
     def select_piece(self, position):
 
         if self.game_over:
-
             return False
 
         piece = self.board.get(position)
 
-        
         if self.must_continue_capture:
 
             if position == self.selected_piece:
-
                 return True
 
             return False
 
+        if self.current_player == RED:
 
-        if (
-            self.current_player == RED
-            and piece not in [RED, 2]
-        ):
+            if piece not in [RED, 2]:
+                return False
 
-            return False
+        elif self.current_player == BLUE:
 
-        if (
-            self.current_player == BLUE
-            and piece not in [BLUE, -2]
-        ):
+            if piece not in [BLUE, -2]:
+                return False
 
-            return False
-
-        
         legal_moves = get_moves_for_piece(
             self.board,
             position,
@@ -83,7 +106,6 @@ class Game:
         )
 
         if not legal_moves:
-
             return False
 
         self.selected_piece = position
@@ -93,7 +115,6 @@ class Game:
     def get_selected_moves(self):
 
         if self.selected_piece is None:
-
             return []
 
         return get_moves_for_piece(
@@ -102,83 +123,67 @@ class Game:
             self.current_player
         )
 
-    def make_move(self, destination):
+    def make_move(self, move):
 
         if self.game_over:
-
             return False
 
-        if self.selected_piece is None:
+        # Get all legal moves
+        legal_moves = self.get_legal_moves()
 
+        # Make sure the supplied move is legal
+        if move not in legal_moves:
             return False
 
-        legal_moves = self.get_selected_moves()
-
-        chosen_move = None
-
-        for move in legal_moves:
-
-            if move.end == destination:
-
-                chosen_move = move
-
-                break
-
-        if chosen_move is None:
-
-            return False
-
-
+        # -------------------------
         # MOVE PIECE
-
+        # -------------------------
 
         self.board.move_piece(
-            chosen_move.start,
-            chosen_move.end
+            move.start,
+            move.end
         )
 
-
+        # -------------------------
         # CAPTURE
-        
+        # -------------------------
 
-        if chosen_move.is_capture:
+        if move.is_capture:
 
             self.board.remove_piece(
-                chosen_move.captured
+                move.captured
             )
 
-    
+        # -------------------------
         # PROMOTION
+        # -------------------------
 
         self.board.promote_piece(
-            chosen_move.end
+            move.end
         )
 
-
+        # -------------------------
         # CHECK FOR ANOTHER CAPTURE
+        # -------------------------
 
-
-        if chosen_move.is_capture:
-
-            next_captures = []
-
-            from .rules import get_capture_moves
+        if move.is_capture:
 
             next_captures = get_capture_moves(
                 self.board,
-                chosen_move.end
+                move.end
             )
 
             if next_captures:
 
-                self.selected_piece = chosen_move.end
+                self.selected_piece = move.end
 
                 self.must_continue_capture = True
 
                 return True
 
+        # -------------------------
         # TURN COMPLETE
-
+        # -------------------------
 
         self.selected_piece = None
 
@@ -186,7 +191,9 @@ class Game:
 
         self.current_player *= -1
 
+        # -------------------------
         # CHECK WIN
+        # -------------------------
 
         self.check_game_over()
 
