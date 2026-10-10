@@ -24,6 +24,7 @@ def send_test_board(board, player=-1):
         timeout=10
     )
 
+
     response.raise_for_status()
     return response.json()
 
