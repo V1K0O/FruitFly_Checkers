@@ -64,3 +64,37 @@ function(req, res) {
     message = "Python board received successfully"
   )
 }
+
+
+#* Choose a legal move (temporary baseline)
+#* @post /decide
+#* @parser json
+function(req, res) {
+  body <- req$body
+  
+  if (is.null(body$board) || is.null(body$legal_moves)) {
+    res$status <- 400
+    return(list(error = "Board and legal_moves are required"))
+  }
+  
+  moves <- body$legal_moves
+  
+
+  number_of_moves <- if (is.data.frame(moves)) {
+    nrow(moves)
+  } else {
+    length(moves)
+  }
+  
+  if (number_of_moves == 0) {
+    res$status <- 400
+    return(list(error = "No legal moves supplied"))
+  }
+  
+  list(
+    status = "ok",
+    move_id = 0,
+    message = "Temporary baseline: selected first legal move"
+  )
+}
+
